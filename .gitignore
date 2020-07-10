@@ -1,0 +1,6 @@
+build/
+results/
+*.docx
+*.png
+*.sublime-project
+*.sublime-workspace
