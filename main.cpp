@@ -17,7 +17,7 @@ int main(int argc, char const *argv[])
 		return -1;
 	}
 
-	graph<char> g;
+	dsa::graph<string> g;
 
 	ifstream input(filename);
 	string line;
@@ -32,9 +32,9 @@ int main(int argc, char const *argv[])
 				fields.push_back(field);
 
 			if (fields[0] == "Add")
-				g.add(fields[1][0], fields[2][0]);
+				g.add(fields[1], fields[2]);
 			else if (fields[0] == "Find")
-				cout << (g.find(fields[1][0]) ? "Yes": "No") << endl;
+				cout << (g.find(fields[1]) ? "Yes": "No") << endl;
 			else if (fields[0] == "Follow")
 				for (const auto& n: g.follow(stoi(fields[1])))
 					cout << n << endl;
