@@ -39,13 +39,12 @@ int main(int argc, char const *argv[])
 				for (const auto& n: g.follow(stoi(fields[1])))
 					cout << n << endl;
 			else if (fields[0] == "Clique")
-				g.clique();
+				for (const auto& clique: g.clique())
+					cout << clique << endl;
 			else if (fields[0] == "Compact")
-				g.compact();
+				g.compact().print();
 		}
 	}
-
-	// g.print_adjacency();
 
 	return 0;
 }

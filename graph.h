@@ -1,7 +1,6 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
-
 #include <iostream>
 #include <utility>
 #include <algorithm>
@@ -13,106 +12,52 @@
 #include "set.h"
 
 using namespace std;
-// template<typename T>
-// using u_set = unordered_set<T>;
-template<typename K, typename V>
-using u_map = unordered_map<K, V>;
 
 namespace dsa {
 
 template <typename T>
 class graph
 {
-	u_map<T, vector<T>> nodes;
+	unordered_map<T, vector<T>> nodes;
 
-	auto bron_kerbosch__ (set<T> R, set<T> P, set<T> X) {
-		if (P.empty() && X.empty() && (R.size() > 2)) {
-			cout << "clique: "<< R << endl;
-			return;
-		}
-
-		set<T> aux(P);
-		for (const auto& v: aux) {
-			// vecinos de v
-			set<T> N;
-			for (const auto& n: nodes[v])
-				N.insert(n);
-
-			auto next_R(R);
-			next_R.insert(v);
-
-			set<T> next_P;
-			set_intersection(begin(P), end(P), 
-							 begin(N), end(N),
-							 inserter(next_P, begin(P)));
-
-			set<T> next_X;
-			set_intersection(begin(X), end(X),
-							 begin(N), end(N),
-							 inserter(next_X, begin(X)));
-
-			// cout << endl;
-			// cout << "N: " << N << endl;
-			// cout << "next_R: " << next_R << endl;
-			// cout << "next_P: " << next_P << endl;
-			// cout << "next_X: " << next_X << endl;
-			// cin.get();
-			bron_kerbosch(next_R, next_P, next_X);
-
-			P.erase(P.find(v));
-			X.insert(v);
-		}
-
+	auto get_neighbours_set(vector<T> n) -> set<T> {
+		set<T> N;
+		copy(begin(n), end(n), inserter(N, begin(N)));
+		return N;
 	}
 
-	auto bron_kerbosch (set<T> R, set<T> P, set<T> X) {
+	auto bron_kerbosch(
+			set<T> R, 
+			set<T> P, 
+			set<T> X, 
+			vector<set<T>>& cliques
+		) {
 		if (P.empty() && X.empty() && (R.size() > 2)) {
-			cout << "clique: "<< R << endl;
+			cliques.push_back(R);
 			return;
 		}
 
 		set<T> aux(P);
 		for (const auto& v: aux) {
-			set<T> N;
-			for (const auto& n: nodes[v])
-				N.insert(n);
+			set<T> N = get_neighbours_set(nodes[v]);
 
 			auto next_R = dsa::set_union(R, {v});
 			auto next_P = dsa::set_intersection(P, N);
 			auto next_X = dsa::set_intersection(X, N);
 
-			bron_kerbosch(next_R, next_P, next_X);
+			bron_kerbosch(next_R, next_P, next_X, cliques);
 
 			P = dsa::set_difference(P, {v});
 			X = dsa::set_union(X, {v});
 		}
 	}
 
-	auto bron_kerbosch_pivot (set<T> R, set<T> P, set<T> X) {
-		if (P.empty() && X.empty() && (R.size() > 2)) {
-			cout << "clique: "<< R << endl;
-			return;
-		}
+	auto clique_compact() -> void {
 
-		set<T> aux(P);
-		for (const auto& v: aux) {
-			set<T> N;
-			for (const auto& n: nodes[v])
-				N.insert(n);
-
-			auto next_R = dsa::set_union(R, {v});
-			auto next_P = dsa::set_intersection(P, N);
-			auto next_X = dsa::set_intersection(X, N);
-
-			bron_kerbosch(next_R, next_P, next_X);
-
-			P = dsa::set_difference(P, {v});
-			X = dsa::set_union(X, {v});
-		}
 	}
 
 public:
-	auto add (T u1, T u2) -> void {
+	auto add(T u1, T u2) -> void {
 		auto& adj1 = nodes[u1];
 		if (std::find(begin(adj1), end(adj1), u2) == end(adj1))
 			adj1.push_back(u2);
@@ -123,8 +68,8 @@ public:
 	}
 
 	// DFS
-	auto find (T u) -> bool {
-		u_map<T, bool> visited;
+	auto find(T u) -> bool {
+		unordered_map<T, bool> visited;
 		for (const auto& node: nodes)
 			visited[node.first] = false;
 
@@ -148,7 +93,7 @@ public:
 		return false;
 	}
 
-	auto follow (int n) -> vector<T> {
+	auto follow(int n) -> vector<T> {
 		auto compare = 
 			[] (const pair<int, T>& a, const pair<int, T>& b) {
 				if (a.first < b.first)
@@ -164,7 +109,7 @@ public:
 		priority_queue<pair<int, T>, 
 					   vector<pair<int, T>>,
 					   decltype(compare)> heap(compare);
-		// priority_queue<pair<int, T>> heap;
+
 		for (const auto& node: nodes)
 			heap.push(make_pair(node.second.size(), node.first));
 
@@ -180,21 +125,46 @@ public:
 		return follow_count;
 	}
 
-	auto clique () /* -> vector<graph<T>> */ {
-		cout << "clique" << endl;
+	auto clique() -> vector<set<T>> {
 		set<T> N;
 		for (const auto& node: nodes)
 			N.insert(node.first);
-		bron_kerbosch(set<T>(), N, set<T>());
-		// return vector<graph<T>>();
+
+		vector<set<T>> cliques;
+		bron_kerbosch(set<T>(), N, set<T>(), cliques);
+
+		return cliques;
 	}
 
-	auto compact () -> graph<T> {
-		cout << "compact" << endl;
+	auto compact() -> graph<T> {
+		cout << endl << __PRETTY_FUNCTION__ << endl;
+		auto cliques = clique();
+
+		vector<set<T>> inter;
+		for (auto& clique: cliques) {
+			for (auto& clique2: cliques) {
+				if (clique != clique2) {
+					auto i = dsa::set_intersection(clique, clique2);
+					if (!i.empty() && (std::find(begin(inter), end(inter), clique2) == end(inter))) {
+						inter.push_back(clique2);
+					}
+				}
+			}
+		}
+		for (auto v: inter)
+			cout << v << endl;
+
+
+		cout << endl;
 		return graph<T>();
 	}
 
-	auto print_adjacency() {
+	// BFS
+	auto print() -> void {
+
+	}
+
+	auto print_adjacency() -> void {
 		for (const auto& node: nodes) {
 			cout << node.first << ": [ ";
 			for (const auto& v: node.second)
@@ -203,20 +173,7 @@ public:
 		}
 		cout << endl;
 	}
-
-	auto size () -> size_t {
-		return nodes.size();
-	}
 };
-
-
-template<typename T>
-ostream& operator << (ostream& out, const set<T> S) {
-	for (const auto& s: S)
-		out << s << " ";
-	return out;
-}
-
 
 } // namespace dsa
 
