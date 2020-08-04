@@ -41,8 +41,10 @@ int main(int argc, char const *argv[])
 			else if (fields[0] == "Clique")
 				for (const auto& clique: g.clique())
 					cout << clique << endl;
-			else if (fields[0] == "Compact")
-				g.compact().print();
+			else if (fields[0] == "Compact") {
+				g.compact(); 
+				g.print();
+			}
 		}
 	}
 

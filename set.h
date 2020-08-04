@@ -5,6 +5,9 @@
 #include <algorithm>
 #include <set>
 
+
+/*  Funcion de utilidad para imprimir set<T> en pantalla.
+ */
 template<typename T>
 std::ostream& operator << (std::ostream& out, const std::set<T> S) {
 	for (const auto& s: S)
@@ -13,6 +16,10 @@ std::ostream& operator << (std::ostream& out, const std::set<T> S) {
 }
 
 namespace dsa {
+
+	/*  Funcion de utilidad para simplificar el calculo de la union de dos 
+	 *  conjuntos.
+	 */
 	template <typename T>
 	auto set_union (std::set<T> A, std::set<T> B) -> std::set<T> {
 		std::set<T> C;
@@ -22,6 +29,9 @@ namespace dsa {
 		return C;
 	}
 
+	/*  Funcion de utilidad para simplificar el calculo de la interseccion de
+	 *  dos conjuntos.
+	 */
 	template <typename T>
 	auto set_intersection (std::set<T> A, std::set<T> B) -> std::set<T> {
 		std::set<T> C;
@@ -31,6 +41,9 @@ namespace dsa {
 		return C;
 	}
 
+	/*  Funcion de utilidad para simplificar el calculo de la diferencia entre
+	 *  dos conjuntos.
+	 */
 	template <typename T>
 	auto set_difference (std::set<T> A, std::set<T> B) -> std::set<T> {
 		std::set<T> C;
@@ -39,6 +52,7 @@ namespace dsa {
 							inserter(C, std::begin(C)));
 		return C;
 	}
-}
+
+} // namspace dsa
 
 #endif
