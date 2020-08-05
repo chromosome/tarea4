@@ -44,22 +44,24 @@ class graph
 	}
 
 	/*  Implementacion del algoritmo de Bron-Kerbosch para obtener todos los 
-	 *  cliques maximales mayores a 2 elementos. Partiendo desde un nodo 
+	 *  cliques maximales mayores a 2 elementos. Partiendo desde un nodo 'v'
 	 *  cualquiera, se toma cada nodo de su lista de adyacencia y se agregan a
 	 *  R uno a la vez. Luego se agrega el resto de los nodos recursivamente 
-	 *  desde la union disjunta de P y X, donde P son los nodos que 
-	 *  potencialmente pertenecen a un clique y X son los nodos que ya fueron 
-	 *  considerados por lo que no deben agregarse a R. Cuando no quedan 
-	 *  elementos en P y en X se ha encontrado un clique maximal. Luego este es
-	 *  agregado a un arreglo de cliques que es pasado por referencia para 
-	 *  poder utilizarlos fuera de la funcion.
+	 *  desde la intersección de P y los nodos adyacentes a 'v', donde P son 
+	 *  los nodos que potencialmente pertenecen a un clique y X son los nodos 
+	 *  que ya fueron considerados por lo que no deben agregarse a R. Cuando no
+	 *  quedan elementos en P y en X se ha encontrado un clique maximal. Luego 
+	 *  este es agregado a un arreglo de cliques que es pasado por referencia 
+	 *  para poder utilizarlos fuera de la funcion.
 	 */
+	int count = 0;
 	auto bron_kerbosch(
 			set<T> R, 
 			set<T> P, 
 			set<T> X, 
 			vector<set<T>>& cliques
 		) {
+
 		if (P.empty() && X.empty() && (R.size() > 2)) {
 			cliques.push_back(R);
 			return;
